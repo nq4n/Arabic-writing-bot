@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <section>
+    <div class="hero">
+      <h1 class="hero-title">لنبدأ بتقييم عملك...</h1>
+      <div class="hero-card card" style="position: relative;">
+          <form method="post" action="{{ url_for('chat') }}" class="hero-form" dir="rtl">
+              <textarea name="text" class="hero-input" placeholder="أكتب تعبيرك هنا..." required rows="5"></textarea>
+              <button type="submit" class="btn btn-icon" title="إرسال للتقييم"><img src="{{ url_for('static', filename='icons/send.svg') }}" alt="إرسال"></button>
+          </form>
+      </div>
+    </div>
+  </section>
+{% endblock %}

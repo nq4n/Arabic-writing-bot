@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>مواضيع التعبير</h2>
+  <p>اختر أحد المواضيع للكتابة أو انقر على "تعلم مع النموذج" للتوجيه والمساعدة.</p>
+  <ul class="topics-list">
+    {% for t in topics %}
+      <li class="topic-item">
+        <h3>{{ t.title }}</h3>
+        <div class="topic-actions">
+          <a class="btn" href="{{ url_for('learn_with_model') }}">تعلم مع النموذج</a>
+          <a class="btn btn-ghost" href="{{ url_for('chat') }}">الكتابة الآن</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

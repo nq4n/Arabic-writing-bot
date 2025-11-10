@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <h2>تفاصيل ومراجعة التعبير</h2>
+
+  {% if show_feedback_prompt %}
+  <div class="card flash-prompt">
+    <h3>هل كان هذا التقييم الآلي مفيدًا لك؟</h3>
+    <form method="post" action="{{ url_for('rate') }}" class="form inline">
+      <input type="hidden" name="submission_id" value="{{ submission.id }}">
+      <button type="submit" name="feedback_type" value="helpful" class="btn">نعم، كان مفيدًا</button>
+      <button type="submit" name="feedback_type" value="not_helpful" class="btn btn-ghost">لا، لم يكن مفيدًا</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="grid">
+    <div class="card">
+      <h3>النص الأصلي</h3>
+      <p class="wrap">{{ submission.text }}</p>
+    </div>
+    <div class="card">
+      <h3>النسخة المصححة (AI)</h3>
+      <p class="wrap muted">{{ submission.ai_fixed_text }}</p>
+    </div>
+  </div>
+
+  <div class="grid secondary-forms">
+      <div class="card">
+        <h3>الأخطاء المكتشفة (AI)</h3>
+        {% if submission.ai_mistakes %}
+          <ul>
+            {% for item in submission.ai_mistakes %}<li>{{ item }}</li>{% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">لم يتم العثور على أخطاء واضحة.</p>
+        {% endif %}
+      </div>
+      <div class="card">
+        <h3>ملاحظاتك على التقييم</h3>
+        {% if submission.student_reflection %}
+          <p class="wrap muted"><strong>ما تعلمته:</strong> {{ submission.student_reflection }}</p>
+        {% else %}
+          <form method="post" action="{{ url_for('submit_reflection') }}" class="form">
+            <input type="hidden" name="submission_id" value="{{ submission.id }}">
+            <label for="reflection">ماذا تعلمت من هذا التقييم؟</label>
+            <textarea name="reflection" id="reflection" rows="3" placeholder="اكتب ملاحظاتك هنا..." required></textarea>
+            <button type="submit" class="btn" style="margin-top: 8px;">إرسال الملاحظات</button>
+          </form>
+        {% endif %}
+      </div>
+  </div>
+
+  <section class="card">
+    <h3>التقييمات</h3>
+    <div class="grades-display">
+        <div class="grade-item">
+            <h4>تقييم المشرف</h4>
+            <p><strong>الدرجة:</strong> {{ submission.grade if submission.grade is not none else "لم تقيّم بعد" }}</p>
+            <p><strong>التعليق:</strong> {{ submission.comment or "لا يوجد تعليق." }}</p>
+        </div>
+        <div class="grade-item">
+            <h4>تقييم الذكاء الاصطناعي</h4>
+            <p><strong>الدرجة النهائية:</strong> {% if submission.ai_grade is not none %}{{ "%.1f"|format(submission.ai_grade) }}/10{% else %}لم تقيّم بعد{% endif %}</p>
+            {% if submission.ai_total_points is not none %}
+              <p><strong>مجموع النقاط:</strong> {{ "%.1f"|format(submission.ai_total_points) }} / {{ submission.ai_rubric_total }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% if submission.ai_rubric_breakdown %}
+    <div class="rubric-display">
+        <h5>تفاصيل تقييم الذكاء الاصطناعي</h5>
+        <table class="rubric-table">
+            <thead>
+                <tr>
+                    <th>المعيار</th>
+                    <th>النقاط</th>
+                    <th>المستوى</th>
+                    <th>التعليق</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in submission.ai_rubric_breakdown %}
+                <tr>
+                    <td class="criterion">{{ item.criterion }}</td>
+                    <td>{{ "%.1f"|format(item.points_awarded) }} / {{ item.max_points }}</td>
+                    <td>{{ item.level }}</td>
+                    <td class="comment-cell">{{ item.comment }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+  </section>
+
+  {% if user.role == 'admin' %}
+  <section class="card">
+    <h3>تقييم المشرف</h3>
+    <form method="post" action="{{ url_for('admin_grade') }}" class="form" id="rubric-form">
+      <input type="hidden" name="submission_id" value="{{ submission.id }}">
+      <input type="hidden" name="redirect_url" value="{{ request.path }}">
+
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th>المعيار</th>
+            <th>ضعيف<br>(1)</th>
+            <th>مقبول<br>(2)</th>
+            <th>جيّد<br>(3)</th>
+            <th>ممتاز<br>(4)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="criterion">سلامة الإملاء</td>
+            <td><input type="radio" name="spelling" value="1"></td>
+            <td><input type="radio" name="spelling" value="2"></td>
+            <td><input type="radio" name="spelling" value="3"></td>
+            <td><input type="radio" name="spelling" value="4"></td>
+          </tr>
+          <tr>
+            <td class="criterion">صحة التراكيب وسلامة الجملة</td>
+            <td><input type="radio" name="grammar" value="1"></td>
+            <td><input type="radio" name="grammar" value="2"></td>
+            <td><input type="radio" name="grammar" value="3"></td>
+            <td><input type="radio" name="grammar" value="4"></td>
+          </tr>
+           <tr>
+            <td class="criterion">علامات الترقيم</td>
+            <td><input type="radio" name="punctuation" value="1"></td>
+            <td><input type="radio" name="punctuation" value="2"></td>
+            <td><input type="radio" name="punctuation" value="3"></td>
+            <td><input type="radio" name="punctuation" value="4"></td>
+          </tr>
+          <tr>
+            <td class="criterion">تنظيم الأفكار وتسلسلها</td>
+            <td><input type="radio" name="organization" value="1"></td>
+            <td><input type="radio" name="organization" value="2"></td>
+            <td><input type="radio" name="organization" value="3"></td>
+            <td><input type="radio" name="organization" value="4"></td>
+          </tr>
+          <!-- Add other criteria similarly -->
+        </tbody>
+      </table>
+
+      <div class="form-section">
+        <label><b>ملاحظات المعلّم:</b>
+          <textarea name="comment" style="width:100%;height:100px;">{{ submission.comment or '' }}</textarea>
+        </label>
+      </div>
+
+      <div class="form-section">
+        <label><b>الدرجة النهائية (من 10):</b>
+          <input name="grade" id="final-grade-input" type="text" style="width:80px;text-align:center;" value="{{ submission.grade or '' }}" readonly>
+        </label>
+      </div>
+
+      <button class="btn" type="submit">حفظ التقييم</button>
+    </form>
+  </section>
+  {% endif %}
+
+</section>
+{% endblock %}

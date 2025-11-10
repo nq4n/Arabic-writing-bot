@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+{% if not user %}
+  <section class="card">
+    <h2>مرحباً بك</h2>
+    <p><a class="btn" href="{{ url_for('login') }}">سجّل الدخول</a></p>
+  </section>
+{% else %}
+  <section>
+    <div class="hero">
+      <h1 class="hero-title">لنبدأ بتقييم عملك...</h1>
+      <div class="hero-card card" style="position: relative;">
+          <form method="post" action="{{ url_for('submit_text') }}" class="hero-form" dir="rtl">
+              <textarea name="text" class="hero-input" placeholder="أكتب تعبيرك هنا..." required rows="5"></textarea>
+              <button type="submit" class="btn btn-icon" title="إرسال للتقييم"><img src="{{ url_for('static', filename='icons/send.svg') }}" alt="إرسال"></button>
+          </form>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay">
+      <div class="modal-content card">
+        <button class="modal-close" title="إغلاق">&times;</button>
+        <h3>تأكيد الإرسال</h3>
+        <p>هل أنت متأكد أنك تريد إرسال النص التالي للتقييم؟</p>
+        <div class="modal-text-preview">
+          <p id="modal-text"></p>
+        </div>
+        <div class="modal-actions">
+          <button id="cancel-submit-btn" class="btn btn-ghost">إلغاء</button>
+          <button id="confirm-submit-btn" class="btn">نعم، أرسل</button>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

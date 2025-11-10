@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>سجل التسليمات</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>النص</th>
+        <th>الدرجة</th>
+        <th>تاريخ الإرسال</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in submissions %}
+      <tr>
+        <td><a href="{{ url_for('submission_detail', submission_id=s.id) }}">{{ s.id }}</a></td>
+        <td class="wrap"><a href="{{ url_for('submission_detail', submission_id=s.id) }}">{{ s.text | truncate(100) }}</a></td>
+        <td>{{ s.grade if s.grade is not none else "لم تُقيّم بعد" }}</td>
+        <td><time datetime="{{ s.created_at }}">{{ s.created_at }}</time></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="muted">لم تقم بأي تسليمات بعد.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

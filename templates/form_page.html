@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card auth">
+  <h2>{{ title }}</h2>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post" action="" class="form">
+    {{ form_body | safe }}
+    <button class="btn" type="submit">{{ button_text }}</button>
+  </form>
+  {{ after_form | safe }}
+</section>
+{% endblock %}

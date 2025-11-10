@@ -1,0 +1,23 @@
+{% extends "admin_base.html" %}
+
+{% set title = "إضافة مستخدم جديد" %}
+{% set button_text = "إنشاء مستخدم" %}
+
+{% set form_body %}
+  <label>اسم المستخدم
+    <input name="username" required>
+  </label>
+  <label>كلمة المرور
+    <input name="password" type="password" required>
+  </label>
+  <label>الدور
+    <select name="role">
+      <option value="student" selected>
+        طالب (student)
+      </option>
+      <option value="admin">
+        مدير (admin)
+      </option>
+    </select>
+  </label>
+{% endset %}

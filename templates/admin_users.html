@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>إدارة المستخدمين</h2>
+  <div class="actions">
+      <a href="{{ url_for('admin_add_user') }}" class="btn">إضافة مستخدم جديد</a>
+      <form method="post" action="{{ url_for('admin_import_users') }}" enctype="multipart/form-data" style="display:inline-block;margin-left:10px;">
+        <label class="btn btn-ghost">استيراد مستخدمين
+          <input type="file" name="file" accept=".csv" style="display:none;" onchange="this.form.submit()">
+        </label>
+      </form>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>اسم المستخدم</th>
+        <th>الدور</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.role }}</td>
+        <td>
+          <a href="{{ url_for('admin_edit_user', user_id=u.id) }}" class="btn btn-ghost">تعديل</a>
+          {% if u.id != current_user_id %}
+          <form method="post" action="{{ url_for('admin_delete_user', user_id=u.id) }}" class="form inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المستخدم؟');">
+            <button class="btn btn-danger" type="submit">حذف</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="muted">لا يوجد مستخدمون.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

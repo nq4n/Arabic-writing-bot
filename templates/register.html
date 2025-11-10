@@ -1,0 +1,13 @@
+{% extends "form_page.html" %}
+
+{% set title = "إنشاء حساب" %}
+{% set button_text = "تسجيل" %}
+
+{% set form_body %}
+  <label>اسم المستخدم
+    <input name="username" required>
+  </label>
+  <label>كلمة المرور
+    <input name="password" type="password" required>
+  </label>
+{% endset %}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "منصّة التعبير" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  {% block before_main %}{% endblock %}
+  <header class="topbar">
+    <div class="container">
+      <a href="{{ url_for('index') }}" class="brand-link">
+        <h1 class="brand">منصّة التعبير</h1>
+      </a>
+      <nav class="main-nav">
+        {% if user %}
+          <button id="theme-toggle" class="nav-icon" title="تبديل الوضع">
+            <img id="theme-icon-light" src="{{ url_for('static', filename='icons/light.svg') }}" alt="Light mode">
+            <img id="theme-icon-dark" src="{{ url_for('static', filename='icons/moon.svg') }}" alt="Dark mode">
+          </button>
+          <a href="{{ url_for('submissions_log') }}" class="nav-icon" title="سجل التسليمات"><img src="{{ url_for('static', filename='icons/log.svg') }}" alt="سجل التسليمات"></a>
+          <a href="{{ url_for('topics') }}" class="nav-link">مواضيع التعبير</a>
+          <div class="user-menu">
+            <button id="user-menu-toggle" class="nav-icon" title="القائمة الشخصية">
+              <img src="{{ url_for('static', filename='icons/user.svg') }}" alt="القائمة الشخصية">
+            </button>
+            <div id="user-menu-dropdown" class="user-menu-dropdown">
+              <a href="{{ url_for('profile') }}">الملف الشخصي</a>
+              <a href="{{ url_for('grades') }}">الدرجات</a>
+              <div class="divider"></div>
+              <a href="{{ url_for('logout') }}">تسجيل الخروج</a>
+            </div>
+          </div>
+          {% if user.role == 'admin' %}<a href="{{ url_for('admin_dashboard') }}">لوحة التحكم</a>{% endif %}
+        {% else %}
+          <a href="{{ url_for('login') }}">دخول</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash container">
+        {% for m in messages %}<div class="flash-item">{{ m }}</div>{% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/kufigraph.js') }}"></script>
+</body>
+</html>

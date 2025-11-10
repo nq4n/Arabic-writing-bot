@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <h2>تفاصيل ومراجعة التعبير</h2>
+
+  {% if show_feedback_prompt %}
+  <div class="card flash-prompt">
+    <h3>هل كان هذا التقييم الآلي مفيدًا لك؟</h3>
+    <form method="post" action="{{ url_for('rate') }}" class="form inline">
+      <input type="hidden" name="submission_id" value="{{ submission.id }}">
+      <button type="submit" name="feedback_type" value="helpful" class="btn">نعم، كان مفيدًا</button>
+      <button type="submit" name="feedback_type" value="not_helpful" class="btn btn-ghost">لا، لم يكن مفيدًا</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="grid">
+    <div class="card">
+      <h3>النص الأصلي</h3>
+      <p class="wrap">{{ submission.text }}</p>
+    </div>
+    <div class="card">
+      <h3>النسخة المصححة (AI)</h3>
+      <p class="wrap muted">{{ submission.ai_fixed_text }}</p>
+    </div>
+  </div>
+
+  <div class="grid secondary-forms">
+      <div class="card">
+        <h3>الأخطاء المكتشفة (AI)</h3>
+        {% if submission.ai_mistakes %}
+          <ul>
+            {% for item in submission.ai_mistakes %}<li>{{ item }}</li>{% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">لم يتم العثور على أخطاء واضحة.</p>
+        {% endif %}
+      </div>
+      <div class="card">
+        <h3>الفوائد المكتسبة (AI)</h3>
+        {% if submission.ai_benefits %}
+          <ul>
+            {% for item in submission.ai_benefits %}<li>{{ item }}</li>{% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">لا توجد فوائد محددة.</p>
+        {% endif %}
+      </div>
+  </div>
+
+  <section class="card">
+    <h3>التقييمات</h3>
+    <div class="grades-display">
+        <div class="grade-item">
+            <h4>تقييم المشرف</h4>
+            <p><strong>الدرجة:</strong> {{ submission.grade if submission.grade is not none else "لم تقيّم بعد" }}</p>
+            <p><strong>التعليق:</strong> {{ submission.comment or "لا يوجد تعليق." }}</p>
+        </div>
+        <div class="grade-item">
+            <h4>تقييم الذكاء الاصطناعي</h4>
+            <p><strong>الدرجة:</strong> {{ submission.ai_grade | default("لم تقيّم بعد", true) }}</p>
+        </div>
+    </div>
+  </section>
+
+  {% if user.role == 'admin' %}
+  <section class="card">
+    <h3>تقييم المشرف</h3>
+    <form method="post" action="{{ url_for('admin_grade') }}" class="form">
+      <input type="hidden" name="submission_id" value="{{ submission.id }}">
+      <input type="hidden" name="redirect_url" value="{{ request.path }}">
+      <div class="grid">
+        <label>الدرجة
+          <input name="grade" type="number" step="0.1" placeholder="مثال: 8.5" value="{{ submission.grade or '' }}">
+        </label>
+        <label>التعليق
+          <input name="comment" type="text" placeholder="أضف تعليقاً..." value="{{ submission.comment or '' }}">
+        </label>
+      </div>
+      <button class="btn" type="submit">حفظ التقييم</button>
+    </form>
+  </section>
+  {% endif %}
+
+</section>
+{% endblock %}

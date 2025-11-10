@@ -1,0 +1,20 @@
+{% extends "admin_base.html" %}
+
+{% set title = "تعديل المستخدم: " ~ user.username %}
+{% set button_text = "حفظ التغييرات" %}
+
+{% set form_body %}
+  <label>اسم المستخدم
+    <input name="username" value="{{ user.username }}" required>
+  </label>
+  <label>الدور
+    <select name="role">
+      <option value="student" {% if user.role == 'student' %}selected{% endif %}>
+        طالب (student)
+      </option>
+      <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>
+        مدير (admin)
+      </option>
+    </select>
+  </label>
+{% endset %}
